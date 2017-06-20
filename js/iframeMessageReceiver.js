@@ -1,74 +1,72 @@
 /*
- * handle message events sent by iframeMessagePoster.js which is included in other party's iframe
+ * handle message events sent by iframeMessagePoster.js which is included in connexys' iframe
  */
  ;(function($) {
 
-	'use strict';
-
-	/**
-	* return domain without http or https
-	* @param {string} url The url to whose domain to return
-	* @returns {undefined}
-	*/
-	var getDomainWithoutProtocol = function(url) {
-		var marker = '://',
-			pos = url.indexOf(marker);
-		if (pos > -1) {
-			url = url.substring(pos + marker.length);
-		}
-
-		return url;
-	};
-
-	/**
-	* return domain without http or https
-	* @param {string} url The url to whose domain to return
-	* @returns {undefined}
-	*/
-	var getDomainWithoutProtocol_ = function(url) {
-		var http = 'http://',
-			https = 'https://';
-		if (url.indexOf(http) > -1) {
-			url = url.substring(http.length-1);
-		} else if (url.indexOf(https) > -1) {
-			url = url.substring(https.length-1);
-		}
-
-		return url;
-	};
+    'use strict';
 
 
-	/**
-	* handle incoming postMessage
-	* @param {jQuery event} jqE The message-event
-	* @returns {undefined}
-	*/
-	var messageHandler = function(jqE) {
+    /**
+    * return the closest ancestor that matches a given selector
+    * @param {html element} el The element whose ancestors to examine
+    * @param {string} s Query selector
+    * @returns {html element | null}
+    */
+    var closest = function(el, s) {
+        var matches = document.querySelectorAll(s),
+            i;
+        do {
+            i = matches.length;
+            while (--i >= 0 && matches.item(i) !== el) {};
+        } while ((i < 0) && (el = el.parentElement)); 
+        return el;
+    };
+    
 
-		var e = jqE.originalEvent;
 
-		if (e.data.indexOf('SizeHeight') === 0) {
+    /**
+    * check if this iframe has a parent which matches the ignoreIframesWithParentSelector
+    * @param {html element} iframe The iframe whose ancestors to examing
+    * @returns {boolean}
+    */
+    var hasIgnoredParent = function(iframe) {
+        var match = false;
+        if (ignoreIframesWithParentSelector) {
+            match = (closest(iframe, ignoreIframesWithParentSelector) !== null);
+        }
+        return match;
+    };
 
-			$('iframe').each(function() {
-				var iframe = this,
-					iframeSrcNoProtocol = getDomainWithoutProtocol(iframe.src),
-					eventOriginNoProtocol = getDomainWithoutProtocol(e.origin);
 
-				// check if the iframe is on the same domain as where the message was sent from
-				// to prevent unwanted scaling of addthis iframes and the like
-				// sometimes origin only contains the domain, not the entire url
-				// and we have had problems with incorrect http/https combinations
-				// so only check origin without protocol
-				if (iframeSrcNoProtocol.indexOf(eventOriginNoProtocol) > -1) {
-					var height = e.data.substring(11) + 'px';
-					 $(iframe).css('height', height);
-				}
-			});
+    /**
+    * handle a post message event
+    * @param {event} e The message event sent by a descendant iframe
+    * @returns {undefined}
+    */
+    var handleMessage = function(e) {
+        var data = e.data,
+            height = data.height + 'px';
 
-		}
-	};
-	
-	// set listener for incoming postMessage
-	$(window).on('message', messageHandler);
+        if (data.messengerId === 'iframeResizer') {
 
-})(jQuery);
+            var iframes = document.getElementsByTagName('iframe');
+            for (var i=0, len=iframes.length; i<len; i++) {
+                var iframe = iframes[i],
+                    srcMatch;
+
+                if (!hasIgnoredParent(iframe)) {
+                    srcMatch = (e.data.url === iframe.src);
+
+                    if (srcMatch) {
+                        iframe.style.height = height;
+                    }
+                }
+             };
+        }
+        
+    };
+
+    var ignoreIframesWithParentSelector = '.hero';
+    window.addEventListener('message', handleMessage);
+
+})();

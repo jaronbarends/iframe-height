@@ -5,8 +5,28 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	
 	<title>child document - iframe communication</title>
-	
+
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<style>
+		body {
+			margin: 0;
+			padding: 0 1em;
+			font-family: arial, helvetica, sans-serif;
+			line-height: 1.5;
+			overflow: hidden;
+		}
+
+		h1 {
+			margin: 0 0 1em;/* when this first element in the body has a margin-top, or when its child's margin-top gets transferred to it, the calculation screws up. In real life this is practically never the case */
+		}
+
+		.block-img {
+			display: block;
+			margin: 1em auto;
+			max-width: 100%;
+		}
+	</style>
 	
 </head>
 <body>
@@ -16,15 +36,16 @@
 
 		<p>
 			Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
-			<img src="http://placekitten.com/720/720" alt="">
+			<img class="block-img" src="http://placekitten.com/720/720" alt="">
 		</p>
+
 
 		<p>
 			Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
-			<img src="http://placekitten.com/720/720" alt="">
+			<img class="block-img" src="http://placekitten.com/720/720" alt="">
 		</p>
 	</div>
 
-	<script src="js/iframeMessagePoster.js"></script>
+	<script src="js/iframeMessagePoster.js" style="margin: 0; padding: 0;"></script>
 </body>
 </html>
